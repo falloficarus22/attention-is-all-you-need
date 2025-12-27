@@ -1,14 +1,7 @@
 import math
 import torch
 import torch.nn as nn
-from architecture import (
-    PositionalEncoding,
-    ScaledDotProductAttention,
-    MultiHeadAttention,
-    FeedForwardNetwork,
-    EncoderLayer,
-    DecoderLayer
-)
+from architecture import *
 
 class Encoder(nn.Module):
     def __init__(self, vocab_size, d_model, num_heads, d_ff, num_layers, max_len = 100, dropout = 0.1):
@@ -24,7 +17,7 @@ class Encoder(nn.Module):
 
     def forward(self, src, src_mask = None):
         # src: (batch, src_seq_len)
-        x = self.embedding * math.sqrt(self.d_model)
+        x = self.embedding(src) * math.sqrt(self.d_model)
         x = self.pos_enc(x)
         x = self.dropout(x)
 
@@ -35,7 +28,7 @@ class Encoder(nn.Module):
     
 class Decoder(nn.Module):
     def __init__(self, vocab_size, d_model, num_heads, d_ff, num_layers, max_len = 100, dropout = 0.1):
-        super().__init()
+        super().__init__()
         self.d_model = d_model
         self.embedding = nn.Embedding(vocab_size, d_model)
         self.pos_enc = PositionalEncoding(d_model, max_len)
@@ -46,7 +39,7 @@ class Decoder(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, tgt, enc_out, src_mask = None, tgt_mask = None):
-        x = self.embedding * math.sqrt(self.d_model)
+        x = self.embedding(tgt) * math.sqrt(self.d_model)
         x = self.pos_enc(x)
         x = self.dropout(x)
 
@@ -68,3 +61,4 @@ class Transformer(nn.Module):
         logits = self.out(dec_out)
 
         return logits
+    

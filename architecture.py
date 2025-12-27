@@ -14,7 +14,7 @@ class PositionalEncoding(nn.Module):
         # Apply sine to even indices, cosine to odd indices
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
-        pe = pe.unsqueeze
+        pe = pe.unsqueeze(0)
 
         self.register_buffer('pe', pe)
 
@@ -55,7 +55,7 @@ class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, num_heads):
         super().__init__()
 
-        assert d_model % num_heads, "d_model must be divisible by num_heads"
+        assert d_model % num_heads == 0, "d_model must be divisible by num_heads"
 
         self.d_model = d_model
         self.num_heads = num_heads
@@ -63,7 +63,7 @@ class MultiHeadAttention(nn.Module):
 
         # Learned projections for queries, keys and values
         self.W_q = nn.Linear(d_model, d_model)
-        self.W_o = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
         self.W_v = nn.Linear(d_model, d_model)
 
         # Final output linear projection
